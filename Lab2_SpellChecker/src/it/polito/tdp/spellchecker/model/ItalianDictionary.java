@@ -3,6 +3,11 @@ package it.polito.tdp.spellchecker.model;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import it.polito.tdp.spellchecker.db.ParolaDAO;
 
 
 public class ItalianDictionary extends Dictionary {
@@ -15,20 +20,36 @@ public class ItalianDictionary extends Dictionary {
 		// TODO Auto-generated constructor stub
 	}
 	
+	
 	@Override
 	public void loadDictionary(){
-		try {
-			BufferedReader br = new BufferedReader(new FileReader("rsc/Italian.txt"));
-			String word;
-			while ((word = br.readLine()) != null) {
-			// Aggiungere word alla struttura dati
-				dizionario.add(word);
-				
-			}
-			br.close();
-			} catch (IOException e){
-			System.out.println("Errore nella lettura del file");
-			}
+		ParolaDAO dao=new ParolaDAO();
+		dizionario=dao.loadDictionary();
 	}
+	
+	//implementazione con il dizionario, erciò faccio l'override dell'omonimo 
+	//metodo della superclasse Dictionary
+	public List<RichWord> spellCheckText(List<String> inputTextList){
+		List<RichWord> lista=new ArrayList<RichWord>();
+		Collections.sort(dizionario);
+		for(String el: inputTextList){
+			if(contains(el)){
+				lista.add(new RichWord(el,true));
+			}else{
+				lista.add(new RichWord(el,false));
+			}
+			
+		}
+		
+		return lista;
+	}
+	
+	
+	
+	public boolean contains(String el){
+		ParolaDAO dao= new ParolaDAO();
+		return dao.contains(el);
+	}
+	
 
 }
